@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NetStream - Movies & TV</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Global Loader -->
+  <div id="global-loader" class="loader-overlay hidden">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Header / Navbar -->
+  <header class="navbar">
+    <div class="navbar-left">
+      <div class="logo">NET<span>STREAM</span></div>
+      <nav class="nav-links">
+        <a href="#hero" id="nav-home" class="nav-link active">Home</a>
+        <a href="#trending" id="nav-movies" class="nav-link">Movies</a>
+        <a href="#hero" id="nav-tv" class="nav-link">TV Shows</a>
+        <a href="#mylist-section" id="nav-mylist" class="nav-link">My List</a>
+      </nav>
+    </div>
+
+    <div class="navbar-right">
+      <form id="search-form" class="search-form">
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Search movies..."
+          aria-label="Search movies"
+        />
+        <button type="submit">Search</button>
+      </form>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="hero" class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1 class="hero-title">Featured Movie</h1>
+      <p class="hero-description">
+        Dive into a world of endless entertainment. Watch trending movies,
+        top-rated classics, and action-packed adventures anytime.
+      </p>
+      <div class="hero-buttons">
+        <button class="btn btn-primary">Play</button>
+        <button class="btn btn-secondary">More Info</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Trending Movies Row -->
+    <section id="trending" class="movie-section">
+      <h2 class="section-title">Trending Movies</h2>
+      <div class="movie-row" data-query="avengers">
+        <div class="movie-cards"></div>
+      </div>
+    </section>
+
+    <!-- Top Rated Row (simulated via search query) -->
+    <section id="toprated" class="movie-section">
+      <h2 class="section-title">Top Rated</h2>
+      <div class="movie-row" data-query="matrix">
+        <div class="movie-cards"></div>
+      </div>
+    </section>
+
+    <!-- Action Movies Row -->
+    <section id="tvshows" class="movie-section">
+      <h2 class="section-title">Action Movies</h2>
+      <div class="movie-row" data-query="action">
+        <div class="movie-cards"></div>
+      </div>
+    </section>
+
+    <!-- Comedy Movies Row -->
+    <section id="comedy" class="movie-section">
+      <h2 class="section-title">Comedy Movies</h2>
+      <div class="movie-row" data-query="comedy">
+        <div class="movie-cards"></div>
+      </div>
+    </section>
+
+    <!-- Search Results -->
+    <section id="search-results-section" class="search-results-section">
+      <h2 class="section-title">Search Results</h2>
+      <p id="no-results" class="no-results hidden">No results found.</p>
+      <div id="search-results" class="search-results-grid"></div>
+    </section>
+
+    <!-- My List (Watchlist) -->
+    <section id="mylist-section" class="search-results-section">
+      <h2 class="section-title">My List</h2>
+      <p id="mylist-empty" class="no-results hidden">No items in your list.</p>
+      <div id="mylist-grid" class="search-results-grid"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
