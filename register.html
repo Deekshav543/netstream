@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register - NetStream</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      min-height: 100vh;
+      background: #000000;
+      background-image: 
+        radial-gradient(circle at 20% 30%, rgba(229, 9, 20, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(229, 9, 20, 0.1) 0%, transparent 50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 1000px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .welcome-card {
+      flex: 1;
+      background: rgba(20, 20, 20, 0.8);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 60px 50px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      display: none;
+    }
+
+    .welcome-card h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 20px;
+    }
+
+    .welcome-card p {
+      font-size: 1.1rem;
+      color: #b3b3b3;
+      line-height: 1.6;
+    }
+
+    .glass-card {
+      flex: 1;
+      background: rgba(20, 20, 20, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 50px 40px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #e50914;
+      letter-spacing: 0.1em;
+    }
+
+    .logo h1 span {
+      color: #ffffff;
+    }
+
+    .form-title {
+      color: #ffffff;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .form-subtitle {
+      color: #b3b3b3;
+      font-size: 0.95rem;
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .form-group {
+      margin-bottom: 22px;
+    }
+
+    .form-group label {
+      display: block;
+      color: #ffffff;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(42, 42, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 1rem;
+      font-family: 'Roboto', sans-serif;
+      transition: border-color 0.15s ease;
+      will-change: border-color;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #e50914;
+    }
+
+    .form-group input::placeholder {
+      color: #808080;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: #e50914;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      font-family: 'Roboto', sans-serif;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+      margin-top: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      position: relative;
+      will-change: background-color;
+    }
+
+    .submit-btn:hover {
+      background: #f6121d;
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 25px;
+      color: #b3b3b3;
+      font-size: 0.9rem;
+    }
+
+    .login-link a {
+      color: #e50914;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+
+    .error-message {
+      color: #e50914;
+      font-size: 0.85rem;
+      margin-top: 5px;
+      display: none;
+      font-weight: 500;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .success-message {
+      color: #10b981;
+      font-size: 0.9rem;
+      margin-top: 10px;
+      text-align: center;
+      display: none;
+      font-weight: 500;
+    }
+
+    .success-message.show {
+      display: block;
+    }
+
+    @media (min-width: 768px) {
+      .welcome-card {
+        display: block;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .glass-card {
+        max-width: 100%;
+        padding: 40px 30px;
+      }
+
+      .form-title {
+        font-size: 1.7rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .glass-card {
+        padding: 35px 25px;
+        border-radius: 15px;
+      }
+
+      .logo h1 {
+        font-size: 1.8rem;
+      }
+
+      .form-title {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="welcome-card">
+      <h2>Welcome!</h2>
+      <p>Join NetStream to access unlimited movies and TV shows. Create your account and start your entertainment journey today.</p>
+    </div>
+
+    <div class="glass-card">
+      <div class="logo">
+        <h1>NET<span>STREAM</span></h1>
+      </div>
+      <h2 class="form-title">Create Account</h2>
+      <p class="form-subtitle">Sign up to get started</p>
+
+      <form id="register-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="Enter username" required autocomplete="username" />
+          <div class="error-message" id="username-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Enter email" autocomplete="email" />
+          <div class="error-message" id="email-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone</label>
+          <input type="tel" id="phone" name="phone" placeholder="Enter phone number" autocomplete="tel" />
+          <div class="error-message" id="phone-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter password" required autocomplete="new-password" />
+          <div class="error-message" id="password-error"></div>
+        </div>
+
+        <div class="success-message" id="success-message"></div>
+        <button type="submit" class="submit-btn" id="submit-btn">Create Account</button>
+      </form>
+
+      <div class="login-link">
+        Already have an account? <a href="login.html">Sign In</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const registerForm = document.getElementById('register-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const successMessage = document.getElementById('success-message');
+
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const password = document.getElementById('password').value;
+
+      // Clear previous messages
+      document.querySelectorAll('.error-message').forEach(el => {
+        el.classList.remove('show');
+        el.textContent = '';
+      });
+      successMessage.classList.remove('show');
+      successMessage.textContent = '';
+
+      // Disable submit button
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating Account...';
+
+      try {
+        const response = await fetch('http://localhost:5000/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username,
+            email,
+            phone,
+            password
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Show success message
+          successMessage.textContent = 'Registration successful! Redirecting...';
+          successMessage.classList.add('show');
+          
+          // Wait a moment then redirect
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1500);
+        } else {
+          // Show error message
+          const errorMsg = data.message || 'Registration failed';
+          successMessage.textContent = '';
+          successMessage.classList.remove('show');
+          
+          // Re-enable button
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Create Account';
+          
+          alert(errorMsg);
+        }
+      } catch (error) {
+        console.error('Registration error:', error);
+        
+        // Re-enable button
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Account';
+        
+        successMessage.textContent = '';
+        successMessage.classList.remove('show');
+        
+        alert('Registration failed. Please check if the server is running and try again.');
+      }
+    });
+  </script>
+</body>
+</html>

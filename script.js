@@ -331,14 +331,16 @@ async function loadHome() {
     { id: "comedy", query: "comedy" },
   ];
 
-  for (const { id, query } of sections) {
+  // Load all sections in parallel for faster loading
+  const promises = sections.map(async ({ id, query }) => {
     const section = document.getElementById(id);
-    if (!section) continue;
+    if (!section) return;
     const row = section.querySelector(".movie-row");
-    if (!row) continue;
-    // eslint-disable-next-line no-await-in-loop
-    await populateRowWithQuery(row, query);
-  }
+    if (!row) return;
+    return populateRowWithQuery(row, query);
+  });
+
+  await Promise.all(promises);
 
   const hero = document.getElementById("hero");
   if (hero) {
@@ -384,7 +386,10 @@ function loadMyList() {
 
 // Initialize rows on page load
 async function init() {
-  await loadHome();
+  // Load home content without blocking page render
+  loadHome().catch(err => {
+    console.error('Error loading home content:', err);
+  });
 }
 
 // Event listeners

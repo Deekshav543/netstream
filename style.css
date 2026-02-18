@@ -176,6 +176,22 @@ body {
   background: var(--color-primary-hover);
 }
 
+.sign-in-btn {
+  margin-left: 1rem;
+  padding: 0.5rem 1.2rem;
+  background: var(--color-primary);
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 0.25rem;
+  transition: background var(--transition-fast);
+}
+
+.sign-in-btn:hover {
+  background: var(--color-primary-hover);
+}
+
 /* Hero Section */
 
 .hero {
