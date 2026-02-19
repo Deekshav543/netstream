@@ -1,0 +1,194 @@
+You are working on my existing project "NetStream".
+
+==================================================
+MAIN GOAL (IMPORTANT)
+==================================================
+Modify my project so that the navigation flow becomes:
+
+1. When the project is opened or deployed → show register.html FIRST
+2. After successful registration → redirect to login.html
+3. After successful login → redirect to index.html (NetStream landing page)
+
+This routing change is REQUIRED.
+
+==================================================
+STRICT RULES
+==================================================
+- DO NOT change the design of index.html, style.css, script.js
+- DO NOT change movie UI, search, navbar or layout
+- Only add authentication flow and routing behaviour
+
+==================================================
+FILES TO CREATE
+==================================================
+Create the following files:
+
+1. register.html
+2. login.html
+3. auth.css
+4. auth.js
+
+==================================================
+GLOBAL ENTRY BEHAVIOR (IMPORTANT)
+==================================================
+When the project is opened:
+
+IF user is NOT logged in
+→ automatically redirect to register.html
+
+IF user is already logged in
+→ allow access to index.html
+
+Use localStorage to track login state:
+localStorage.setItem("netstream_logged_in", "true")
+
+==================================================
+BACKGROUND DESIGN
+==================================================
+Use my Netflix landing page as background.
+
+Implementation:
+- Take screenshot/hero section of index page OR use same background image
+- Apply:
+
+background-size: cover
+background-position: center
+filter: blur(8px)
+
+Add overlay:
+background: rgba(0,0,0,0.65)
+
+Both register.html and login.html MUST use SAME background.
+
+==================================================
+GLASSMORPHISM CARD DESIGN
+==================================================
+Form card should be:
+
+background: rgba(255,255,255,0.08)
+backdrop-filter: blur(20px)
+border-radius: 20px
+border: 1px solid rgba(255,255,255,0.2)
+box-shadow: 0 8px 40px rgba(0,0,0,0.6)
+
+Inputs:
+- transparent
+- white text
+- rounded edges
+- glow on focus
+
+Buttons:
+- Netflix red (#e50914)
+- hover scale effect
+- smooth transitions
+
+==================================================
+REGISTER PAGE (register.html)
+==================================================
+
+Fields:
+- username
+- email
+- phone
+- password
+
+On clicking CREATE ACCOUNT:
+
+Call:
+POST http://localhost:5000/register
+
+Body JSON:
+{
+  username,
+  email,
+  phone,
+  password
+}
+
+On success:
+- alert "Registration successful"
+- redirect to login.html
+
+==================================================
+LOGIN PAGE (login.html)
+==================================================
+
+Fields:
+- username
+- password
+
+On clicking SIGN IN:
+
+Call:
+POST http://localhost:5000/login
+
+If success:
+- localStorage.setItem("netstream_logged_in", "true")
+- redirect to index.html
+
+If failure:
+- show "Invalid username or password"
+
+==================================================
+INDEX PAGE PROTECTION (IMPORTANT)
+==================================================
+
+Modify index.html or script.js minimally:
+
+At page load:
+
+IF localStorage.getItem("netstream_logged_in") !== "true"
+→ redirect to register.html
+
+This ensures user cannot access NetStream without login.
+
+==================================================
+OPTIONAL (GOOD UX)
+==================================================
+Add a small logout button in navbar:
+
+On click:
+localStorage.removeItem("netstream_logged_in")
+redirect to login.html
+
+==================================================
+BACKEND
+==================================================
+Use my existing backend in /backend folder:
+
+POST /register
+POST /login
+
+Do not change backend logic.
+
+==================================================
+FINAL OUTPUT
+==================================================
+After implementation:
+
+When I deploy project:
+
+1. User sees Register Page first
+2. Then Login page
+3. Then NetStream landing page
+
+==================================================
+EXECUTION
+==================================================
+After generating code:
+
+Run backend:
+cd backend
+npm install
+node server.js
+
+Then open:
+register.html
+
+==================================================
+DESIGN EXPECTATION
+==================================================
+- Premium Netflix style
+- Blurred cinematic background
+- Glassmorphism UI
+- Smooth transitions
