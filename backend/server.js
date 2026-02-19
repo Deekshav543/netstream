@@ -1,23 +1,26 @@
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
+const path = require('path');
 const pool = require('./db');
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Initialize database table on server startup
+app.use(express.static(path.join(__dirname, '..'), {
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  }
+}));
+
 async function initializeDatabase() {
   try {
-    const connection = await pool.getConnection();
-    await connection.query(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         username VARCHAR(50) UNIQUE NOT NULL,
         password VARCHAR(255) NOT NULL,
         email VARCHAR(100),
@@ -25,203 +28,171 @@ async function initializeDatabase() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
-    connection.release();
     console.log('Database table initialized successfully');
   } catch (error) {
     console.error('Error initializing database:', error);
   }
 }
 
-// POST /register
 app.post('/register', async (req, res) => {
-  let connection;
   try {
     const { username, password, email, phone } = req.body;
 
-    // Validation
     if (!username || !password) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Username and password are required' 
+      return res.status(400).json({
+        success: false,
+        message: 'Username and password are required'
       });
     }
 
     if (username.trim().length === 0 || password.trim().length === 0) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Username and password cannot be empty' 
+      return res.status(400).json({
+        success: false,
+        message: 'Username and password cannot be empty'
       });
     }
 
-    connection = await pool.getConnection();
-
-    // Check if user already exists
-    const [existingUsers] = await connection.execute(
-      'SELECT id FROM users WHERE username = ?',
+    const existingUsers = await pool.query(
+      'SELECT id FROM users WHERE username = $1',
       [username.trim()]
     );
 
-    if (existingUsers.length > 0) {
-      connection.release();
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Username already exists' 
+    if (existingUsers.rows.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Username already exists'
       });
     }
 
-    // Hash password using bcrypt with proper error handling
     const saltRounds = 10;
     let hashedPassword;
     try {
       hashedPassword = await bcrypt.hash(password, saltRounds);
     } catch (hashError) {
       console.error('Password hashing error:', hashError);
-      connection.release();
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Error processing password' 
+      return res.status(500).json({
+        success: false,
+        message: 'Error processing password'
       });
     }
 
-    // Insert user into database
     try {
-      await connection.execute(
-        'INSERT INTO users (username, password, email, phone) VALUES (?, ?, ?, ?)',
+      await pool.query(
+        'INSERT INTO users (username, password, email, phone) VALUES ($1, $2, $3, $4)',
         [
-          username.trim(), 
-          hashedPassword, 
-          email ? email.trim() : null, 
+          username.trim(),
+          hashedPassword,
+          email ? email.trim() : null,
           phone ? phone.trim() : null
         ]
       );
-      connection.release();
-      
+
       console.log(`User registered successfully: ${username}`);
-      return res.status(200).json({ 
-        success: true, 
-        message: 'Registration successful' 
+      return res.status(200).json({
+        success: true,
+        message: 'Registration successful'
       });
     } catch (insertError) {
-      connection.release();
       console.error('Database insert error:', insertError);
-      
-      // Check for duplicate username error
-      if (insertError.code === 'ER_DUP_ENTRY') {
-        return res.status(400).json({ 
-          success: false, 
-          message: 'Username already exists' 
+
+      if (insertError.code === '23505') {
+        return res.status(400).json({
+          success: false,
+          message: 'Username already exists'
         });
       }
-      
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Registration failed. Please try again.' 
+
+      return res.status(500).json({
+        success: false,
+        message: 'Registration failed. Please try again.'
       });
     }
   } catch (error) {
-    if (connection) {
-      connection.release();
-    }
     console.error('Registration error:', error);
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Registration failed. Please try again.' 
+    return res.status(500).json({
+      success: false,
+      message: 'Registration failed. Please try again.'
     });
   }
 });
 
-// POST /login
 app.post('/login', async (req, res) => {
-  let connection;
   try {
     const { username, password } = req.body;
 
-    // Validation
     if (!username || !password) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Username and password are required' 
+      return res.status(400).json({
+        success: false,
+        message: 'Username and password are required'
       });
     }
 
     if (username.trim().length === 0 || password.trim().length === 0) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Username and password cannot be empty' 
+      return res.status(400).json({
+        success: false,
+        message: 'Username and password cannot be empty'
       });
     }
 
-    connection = await pool.getConnection();
-
-    // Fetch user from database
-    const [users] = await connection.execute(
-      'SELECT id, username, password FROM users WHERE username = ?',
+    const result = await pool.query(
+      'SELECT id, username, password FROM users WHERE username = $1',
       [username.trim()]
     );
 
-    connection.release();
-
-    if (users.length === 0) {
-      return res.status(200).json({ 
-        success: false, 
-        message: 'Invalid username or password' 
+    if (result.rows.length === 0) {
+      return res.status(200).json({
+        success: false,
+        message: 'Invalid username or password'
       });
     }
 
-    const user = users[0];
+    const user = result.rows[0];
 
-    // Verify password hash exists
     if (!user.password || user.password.length === 0) {
       console.error('User found but password hash is missing');
-      return res.status(200).json({ 
-        success: false, 
-        message: 'Invalid username or password' 
+      return res.status(200).json({
+        success: false,
+        message: 'Invalid username or password'
       });
     }
 
-    // Compare entered password with stored hashed password using bcrypt.compare()
     let isPasswordValid = false;
     try {
       isPasswordValid = await bcrypt.compare(password, user.password);
     } catch (compareError) {
       console.error('Password comparison error:', compareError);
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Login failed. Please try again.' 
+      return res.status(500).json({
+        success: false,
+        message: 'Login failed. Please try again.'
       });
     }
 
     if (isPasswordValid) {
       console.log(`User logged in successfully: ${username}`);
-      return res.status(200).json({ 
-        success: true, 
-        message: 'Login successful' 
+      return res.status(200).json({
+        success: true,
+        message: 'Login successful'
       });
     } else {
-      return res.status(200).json({ 
-        success: false, 
-        message: 'Invalid username or password' 
+      return res.status(200).json({
+        success: false,
+        message: 'Invalid username or password'
       });
     }
   } catch (error) {
-    if (connection) {
-      connection.release();
-    }
     console.error('Login error:', error);
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Login failed. Please try again.' 
+    return res.status(500).json({
+      success: false,
+      message: 'Login failed. Please try again.'
     });
   }
 });
 
-// Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Server is running' });
 });
 
-// Start server
-app.listen(PORT, async () => {
+app.listen(PORT, '0.0.0.0', async () => {
   console.log(`Server running on port ${PORT}`);
   await initializeDatabase();
 });
